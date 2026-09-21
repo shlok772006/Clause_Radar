@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { parsePdf, PdfProcessingError, PdfError } from '@/lib/pdf';
 import { segmentClauses } from '@/lib/segment';
-import { createSession } from '@/lib/store';
+import { createSession, updateSession } from '@/lib/store';
+import { scanForInjection } from '@/lib/injection';
+import { extractFields } from '@/lib/extract';
 import { VerifiedFields } from '@/lib/types';
 
 // Rate limiting: 5 uploads per hour per IP
@@ -102,6 +104,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     const parseResult = await parsePdf(arrayBuffer);
     const clauses = segmentClauses(parseResult.text, parseResult.pageBreaks);
 
+    // Scan for prompt injection manipulation attempts
+    const injectionFindings = scanForInjection(clauses);
+
     const sessionId = createSession({
       filename,
       pageCount: parseResult.pageCount,
@@ -109,9 +114,22 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       vectors: [],
       fields: initialEmptyFields,
       rubric: [],
-      findings: [],
+      findings: injectionFindings,
       concerns: [],
     });
+
+    // Background P1 extraction — non-blocking
+    if (process.env.GEMINI_API_KEY) {
+      extractFields(clauses)
+        .then((verifiedFields) => {
+          updateSession(sessionId, { fields: verifiedFields });
+          console.info(`[extract] sessionId=${sessionId} fieldsVerified=${verifiedFields.__verification.checked - verifiedFields.__verification.discarded.length}`);
+        })
+        .catch(() => {
+          // Failure logged safely, non-blocking
+          console.warn(`[extract_warn] sessionId=${sessionId} background extraction failed`);
+        });
+    }
 
     const elapsedMs = Date.now() - startTime;
     // Log ONLY IDs, counts, timings per AGENTS.md rule 8

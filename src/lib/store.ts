@@ -44,6 +44,18 @@ export function getSession(id: string): Session | null {
   return s;
 }
 
+export function updateSession(id: string, partial: Partial<Session>): boolean {
+  sweep();
+  const session = sessions.get(id);
+  if (!session) return false;
+  if (Date.now() - session.createdAt > TTL_MS) {
+    sessions.delete(id);
+    return false;
+  }
+  sessions.set(id, { ...session, ...partial });
+  return true;
+}
+
 export function deleteSession(id: string): boolean {
   return sessions.delete(id);
 }
