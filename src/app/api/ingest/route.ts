@@ -4,6 +4,9 @@ import { segmentClauses } from '@/lib/segment';
 import { createSession, updateSession } from '@/lib/store';
 import { scanForInjection } from '@/lib/injection';
 import { extractFields } from '@/lib/extract';
+import { matchRubric, loadPrecomputedVectors } from '@/lib/rubric';
+import { evaluateRules } from '@/lib/rules';
+import { RUBRIC_ITEMS } from '@/lib/rubric-data';
 import { VerifiedFields } from '@/lib/types';
 
 // Rate limiting: 5 uploads per hour per IP
@@ -107,26 +110,38 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     // Scan for prompt injection manipulation attempts
     const injectionFindings = scanForInjection(clauses);
 
+    // Compute 20-clause rubric audit
+    const precomputedVectors = loadPrecomputedVectors();
+    const rubricResults = matchRubric(clauses, RUBRIC_ITEMS, precomputedVectors);
+
     const sessionId = createSession({
       filename,
       pageCount: parseResult.pageCount,
       clauses,
       vectors: [],
       fields: initialEmptyFields,
-      rubric: [],
+      rubric: rubricResults,
       findings: injectionFindings,
       concerns: [],
     });
 
-    // Background P1 extraction — non-blocking
+    // Background P1 extraction & Risk Rules evaluation
     if (process.env.GEMINI_API_KEY) {
       extractFields(clauses)
         .then((verifiedFields) => {
-          updateSession(sessionId, { fields: verifiedFields });
-          console.info(`[extract] sessionId=${sessionId} fieldsVerified=${verifiedFields.__verification.checked - verifiedFields.__verification.discarded.length}`);
+          const riskFindings = evaluateRules(verifiedFields, clauses);
+          const allFindings = [...injectionFindings, ...riskFindings];
+
+          updateSession(sessionId, {
+            fields: verifiedFields,
+            findings: allFindings,
+          });
+
+          console.info(
+            `[extract_and_rules] sessionId=${sessionId} fieldsVerified=${verifiedFields.__verification.checked - verifiedFields.__verification.discarded.length} risksFound=${riskFindings.length}`
+          );
         })
         .catch(() => {
-          // Failure logged safely, non-blocking
           console.warn(`[extract_warn] sessionId=${sessionId} background extraction failed`);
         });
     }
