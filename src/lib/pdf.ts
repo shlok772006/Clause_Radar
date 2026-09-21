@@ -40,6 +40,9 @@ interface PDFLoadingTask {
 }
 
 interface PDFJSLegacyLib {
+  GlobalWorkerOptions: {
+    workerSrc: string;
+  };
   getDocument(params: {
     data: Uint8Array;
     isEvalSupported?: boolean;
@@ -79,6 +82,10 @@ export async function parsePdf(buffer: ArrayBuffer): Promise<PdfParseResult> {
   try {
     const imported = (await import('pdfjs-dist/legacy/build/pdf.mjs')) as unknown as PDFJSLegacyLib;
     pdfjsLib = imported;
+
+    if (!pdfjsLib.GlobalWorkerOptions?.workerSrc) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = import.meta.resolve('pdfjs-dist/legacy/build/pdf.worker.mjs');
+    }
   } catch (err) {
     throw new PdfProcessingError({
       type: 'parse_failed',
