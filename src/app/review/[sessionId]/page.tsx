@@ -261,6 +261,8 @@ export default function ReviewPage({ params }: { params: Promise<{ sessionId: st
           <FindingsPane
             sessionId={sessionId}
             clauses={clauses}
+            findings={session?.findings || []}
+            rubric={session?.rubric || []}
             selectedClauseId={selectedClauseId}
             onSelectClause={handleSelectClause}
           />

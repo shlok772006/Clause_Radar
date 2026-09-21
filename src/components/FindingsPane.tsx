@@ -1,12 +1,19 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Clause } from '@/lib/types';
+import { Clause, Finding, RubricResult, RubricItem, Concern } from '@/lib/types';
 import { AskPanel } from './AskPanel';
+import { ConcernPicker } from './ConcernPicker';
+import { RiskDashboard } from './RiskDashboard';
+import { MissingReport } from './MissingReport';
+import { RUBRIC_ITEMS } from '@/lib/rubric-data';
 
 export interface FindingsPaneProps {
   sessionId: string;
   clauses: Clause[];
+  findings?: Finding[];
+  rubric?: RubricResult[];
+  rubricItems?: RubricItem[];
   selectedClauseId: string | null;
   onSelectClause: (clauseId: string) => void;
 }
@@ -16,11 +23,21 @@ type TabType = 'clauses' | 'risks' | 'missing' | 'ask';
 export function FindingsPane({
   sessionId,
   clauses,
+  findings = [],
+  rubric = [],
+  rubricItems = RUBRIC_ITEMS,
   selectedClauseId,
   onSelectClause,
 }: FindingsPaneProps) {
   const [activeTab, setActiveTab] = useState<TabType>('clauses');
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedConcerns, setSelectedConcerns] = useState<Concern[]>(['exit', 'pay']);
+
+  const handleToggleConcern = (concern: Concern) => {
+    setSelectedConcerns((prev) =>
+      prev.includes(concern) ? prev.filter((c) => c !== concern) : [...prev, concern]
+    );
+  };
 
   const filteredClauses = clauses.filter((c) => {
     if (!searchQuery.trim()) return true;
@@ -32,6 +49,8 @@ export function FindingsPane({
       c.headingPath.some((h) => h.toLowerCase().includes(q))
     );
   });
+
+  const missingCount = rubric.filter((r) => r.presence === 'missing').length;
 
   return (
     <aside className="flex flex-col h-full bg-paper overflow-hidden select-text border-l border-rule">
@@ -66,9 +85,13 @@ export function FindingsPane({
           role="tab"
         >
           <span>Risks</span>
-          <span className="text-[9px] bg-paper px-1 py-0.2 rounded border border-rule text-ink-soft">
-            Phase 2
-          </span>
+          {findings.length > 0 ? (
+            <span className="text-[10px] bg-red-50 text-flag px-1.5 py-0.5 rounded-full border border-red-200 font-mono font-bold">
+              {findings.length}
+            </span>
+          ) : (
+            <span className="w-1.5 h-1.5 rounded-full bg-rule" />
+          )}
         </button>
 
         <button
@@ -83,9 +106,15 @@ export function FindingsPane({
           role="tab"
         >
           <span>Missing</span>
-          <span className="text-[9px] bg-paper px-1 py-0.2 rounded border border-rule text-ink-soft">
-            Phase 3
-          </span>
+          {missingCount > 0 ? (
+            <span className="text-[10px] bg-paper px-1.5 py-0.5 rounded-full border border-rule font-mono">
+              {missingCount}
+            </span>
+          ) : (
+            <span className="text-[10px] bg-paper px-1.5 py-0.5 rounded-full border border-rule font-mono">
+              20
+            </span>
+          )}
         </button>
 
         <button
@@ -103,6 +132,14 @@ export function FindingsPane({
           <span className="w-1.5 h-1.5 rounded-full bg-verified" />
         </button>
       </nav>
+
+      {/* Concern Picker Filter Bar (shown on Risks and Missing tabs) */}
+      {(activeTab === 'risks' || activeTab === 'missing') && (
+        <ConcernPicker
+          selectedConcerns={selectedConcerns}
+          onToggleConcern={handleToggleConcern}
+        />
+      )}
 
       {/* Tab Contents */}
       <div className="flex-1 overflow-y-auto">
@@ -170,37 +207,20 @@ export function FindingsPane({
         )}
 
         {activeTab === 'risks' && (
-          <div className="p-8 text-center my-auto flex flex-col items-center">
-            <div className="w-10 h-10 rounded-full bg-flag/10 text-flag flex items-center justify-center mb-3">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-            </div>
-            <h2 className="text-sm font-semibold text-ink mb-1">Risk Review Engine</h2>
-            <p className="text-xs text-ink-soft max-w-xs mb-3">
-              Phase 2 will evaluate 14 Indian employment risk rules with verbatim clause citations.
-            </p>
-            <span className="text-[10px] font-mono text-ink-soft bg-rule/30 px-2 py-0.5 rounded">
-              Ready in Phase 3
-            </span>
-          </div>
+          <RiskDashboard
+            findings={findings}
+            selectedConcerns={selectedConcerns}
+            onHighlightClause={onSelectClause}
+          />
         )}
 
         {activeTab === 'missing' && (
-          <div className="p-8 text-center my-auto flex flex-col items-center">
-            <div className="w-10 h-10 rounded-full bg-rule/50 text-ink flex items-center justify-center mb-3">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-              </svg>
-            </div>
-            <h2 className="text-sm font-semibold text-ink mb-1">Missing Clause Rubric</h2>
-            <p className="text-xs text-ink-soft max-w-xs mb-3">
-              Phase 3 will audit this agreement against 20 standard Indian employment clauses.
-            </p>
-            <span className="text-[10px] font-mono text-ink-soft bg-rule/30 px-2 py-0.5 rounded">
-              Ready in Phase 3
-            </span>
-          </div>
+          <MissingReport
+            rubricResults={rubric}
+            rubricItems={rubricItems}
+            selectedConcerns={selectedConcerns}
+            onHighlightClause={onSelectClause}
+          />
         )}
 
         {activeTab === 'ask' && (
