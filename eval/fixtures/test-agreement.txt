@@ -1,0 +1,89 @@
+EMPLOYMENT AGREEMENT
+
+This Employment Agreement ("Agreement") is entered into on this 1st day of April, 2024, by and between:
+Apex Technologies India Private Limited, a company incorporated under the Companies Act, 2013, having its registered office at Prestige Tech Park, Marathahalli-Sarjapur Outer Ring Road, Bangalore 560103, Karnataka, India (hereinafter referred to as the "Company" or "Employer", which expression shall include its successors and assigns);
+AND
+Rahul Sharma, an individual residing at Flat 402, Green Glen Layout, Bellandur, Bangalore 560103 (hereinafter referred to as the "Employee").
+
+WHEREAS the Company desires to employ the Employee, and the Employee desires to accept employment with the Company, on the terms and conditions set forth herein.
+
+NOW, THEREFORE, IN CONSIDERATION OF THE MUTUAL COVENANTS CONTAINED HEREIN, THE PARTIES AGREE AS FOLLOWS:
+
+1. APPOINTMENT AND COMMENCEMENT
+1.1 Position and Duties
+The Employee is appointed to the position of Senior Software Engineer. The Employee will report to the Engineering Director and perform duties customary to this position, along with any other responsibilities reasonably assigned by the Company.
+1.2 Commencement Date
+The Employee's employment shall commence on 15th April, 2024 ("Effective Date").
+1.3 Location of Employment
+The primary place of employment shall be Bangalore, Karnataka. The Company reserves the right to transfer or reassign the Employee to any other office or client location within India.
+
+2. PROBATION PERIOD
+2.1 Duration of Probation
+The Employee shall be on probation for a period of three (3) months from the Effective Date. The Company may, at its sole discretion, extend this probation period by written communication.
+2.2 Confirmation
+Upon satisfactory completion of the probation period, the Company shall issue a formal letter confirming the Employee's appointment.
+
+3. COMPENSATION AND BENEFITS
+3.1 Fixed and Variable Remuneration
+The Employee shall receive an annual Cost to Company (CTC) as detailed in Schedule A attached hereto. All payments are subject to standard statutory deductions including Provident Fund, Professional Tax, and Income Tax deducted at source (TDS).
+3.2 Annual Discretionary Bonus
+The Employee may be eligible for a performance bonus as determined by the Company's annual performance review cycle. Any variable compensation or bonus is entirely discretionary and shall be forfeited if the Employee has tendered resignation or is serving a notice period on the date of disbursement.
+
+4. WORKING HOURS AND LEAVE
+4.1 Business Hours
+Standard working hours are 9:30 AM to 6:30 PM, Monday through Friday. Due to business requirements and client engagements, the Employee may be required to work additional hours without additional compensation.
+4.2 Annual Leave Entitlement
+The Employee shall be entitled to eighteen (18) days of earned leave, twelve (12) days of casual/sick leave, and national holidays as declared by the Company annually. Unused casual leave cannot be encashed or carried forward.
+
+CONFIDENTIALITY AND NON-DISCLOSURE
+5.1 Proprietary Information
+During employment and for a period of three (3) years following termination of employment for any reason, the Employee shall maintain strict confidentiality regarding all proprietary information, trade secrets, algorithms, customer lists, financial data, and technical processes of the Company.
+5.2 Return of Company Property
+Upon resignation or termination, the Employee shall immediately return all Company property, including laptops, mobile devices, security badges, and all physical or digital files.
+
+6. INTELLECTUAL PROPERTY RIGHTS
+6.1 Work for Hire and Assignment
+All inventions, designs, source code, documentation, trademarks, and literary works created by the Employee during the term of employment, whether on Company premises or using personal equipment, shall be deemed a "work made for hire" under the Copyright Act, 1957.
+6.2 Moral Rights Waiver
+To the maximum extent permissible under applicable law, the Employee irrevocably waives all moral rights in any intellectual property created during the employment term.
+
+RESTRICTIVE COVENANTS
+7.1 Non-Compete Restriction
+For a period of twelve (12) months following the termination of employment, the Employee shall not directly or indirectly accept employment with, consult for, or establish any business competing with the products or services offered by the Company within the territory of India.
+7.2 Non-Solicitation of Clients and Employees
+For a period of twenty-four (24) months following termination, the Employee shall not solicit, induce, or attempt to hire any employee of the Company, nor solicit business from any client or prospective customer with whom the Employee had contact in the prior twelve months.
+
+8. TERMINATION AND NOTICE PERIOD
+8.1 Notice Period
+Either party may terminate this employment agreement by providing sixty (60) days prior written notice.
+8.2 Payment in Lieu of Notice
+The Company reserves the right, at its sole discretion, to waive the notice period by paying basic salary in lieu of notice. The Employee shall not have an automatic right to buy out the notice period unless expressly approved in writing by HR management.
+8.3 Immediate Termination for Cause
+The Company may terminate this Agreement immediately without notice, salary in lieu of notice, or any severance payment, in the event of gross misconduct, material breach of policy, fraud, conviction of a criminal offense, or habitual absence.
+
+9. SERVICE BOND AND LIQUIDATED DAMAGES
+9.1 Minimum Service Period
+In consideration of specialized training provided by the Company upon joining, the Employee agrees to serve the Company for a minimum commitment period of twenty-four (24) months from the Effective Date.
+9.2 Recovery Amount
+If the Employee resigns or terminates employment prior to completing twenty-four months, the Employee shall immediately pay the Company a sum of INR 2,50,000 (Rupees Two Lakh Fifty Thousand) as liquidated damages for training expenses.
+
+10. GOVERNING LAW AND DISPUTE RESOLUTION
+10.1 Governing Law
+This Agreement shall be construed, interpreted, and governed in accordance with the laws of the Republic of India.
+10.2 Jurisdiction and Arbitration
+Any dispute arising out of or in connection with this Agreement shall be referred to arbitration in Bangalore, Karnataka, conducted in accordance with the Arbitration and Conciliation Act, 1996. The courts in Bangalore shall have exclusive jurisdiction.
+
+SCHEDULE A — COMPENSATION
+1. Base Salary: INR 12,00,000 per annum payable in monthly instalments.
+2. House Rent Allowance (HRA): INR 6,00,000 per annum.
+3. Special Allowance: INR 4,00,000 per annum.
+4. Annual Performance Variable: Up to INR 3,00,000 per annum based on performance milestones.
+5. Total Target Cost to Company (CTC): INR 25,00,000 per annum.
+
+IN WITNESS WHEREOF, the parties hereto have executed this Agreement as of the day and year first written above.
+
+For Apex Technologies India Private Limited:
+Authorized Signatory: _______________________
+
+Employee:
+Rahul Sharma: _______________________
