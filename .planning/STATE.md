@@ -3,10 +3,10 @@
 ## Current State
 
 - **Milestone:** v1.0
-- **Current Phase:** 1 (The Spine)
-- **Phase Status:** complete
-- **Last Action:** execute-phase 1 complete — all 5 waves executed and verified
-- **Next Action:** Phase 2 (Grounding and Refusal)
+- **Current Phase:** 2 (Grounding and Refusal)
+- **Phase Status:** discussing_complete
+- **Last Action:** discuss-phase 2 completed — 2-CONTEXT.md created
+- **Next Action:** `/gsd-plan-phase 2` → create 2-PLAN.md
 
 ## Phase Progress
 
