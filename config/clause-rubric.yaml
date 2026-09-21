@@ -1,0 +1,183 @@
+defaults:
+  threshold: 0.62
+
+items:
+  - id: compensation
+    label: Salary and how it is paid
+    concern: pay
+    severityIfMissing: high
+    whyItMatters: Without a stated figure and payment date, your pay is whatever the offer email said, which is not part of the contract.
+    ifMissingAsk: Can the exact CTC breakdown and monthly payment date be written into the agreement?
+    queries: ["monthly salary and payment date", "annual compensation payable", "remuneration and salary structure"]
+    keywords: [salary, remuneration, compensation, CTC, payable]
+
+  - id: variable_pay
+    label: Bonus and variable pay conditions
+    concern: pay
+    severityIfMissing: medium
+    whyItMatters: Variable pay is often discretionary and forfeited if you resign before the payout date. If the conditions are not written down, you cannot rely on it.
+    ifMissingAsk: What are the exact conditions and payout dates for variable pay, and what happens if I resign before them?
+    queries: ["performance bonus and incentive payment conditions", "variable pay eligibility and payout"]
+    keywords: [bonus, variable, incentive, performance pay]
+
+  - id: probation
+    label: Probation period and confirmation
+    concern: termination
+    severityIfMissing: medium
+    whyItMatters: During probation, notice periods are usually much shorter and termination is easier. You need to know how long it lasts and how confirmation happens.
+    ifMissingAsk: How long is probation, and is confirmation automatic or does it require a written letter?
+    queries: ["probation period and confirmation of employment", "probationary term"]
+    keywords: [probation, probationary, confirmation]
+
+  - id: notice_employee
+    label: Notice period you must give
+    concern: exit
+    severityIfMissing: high
+    whyItMatters: This determines how long you are locked in after you decide to leave, and most new employers will not wait indefinitely.
+    ifMissingAsk: What notice must I give to resign, and can I buy it out?
+    queries: ["notice period required from employee on resignation", "employee shall give written notice"]
+    keywords: [notice period, resignation, resign, notice in writing]
+
+  - id: notice_employer
+    label: Notice period the company must give
+    concern: termination
+    severityIfMissing: high
+    whyItMatters: If the company can end your employment with less notice than you must give, the relationship is one-sided.
+    ifMissingAsk: What notice will the company give me, and can it be shorter than mine?
+    queries: ["company may terminate by giving notice", "employer notice of termination"]
+    keywords: [company may terminate, employer shall give notice]
+
+  - id: severance
+    label: Severance or payment in lieu of notice
+    concern: termination
+    severityIfMissing: medium
+    whyItMatters: Without this, termination can mean zero income from the day you are told, with no transition period.
+    ifMissingAsk: If I am terminated without cause, is there any severance or payment in lieu of notice?
+    queries: ["severance pay on termination", "payment in lieu of notice", "salary in lieu"]
+    keywords: [severance, in lieu of notice, retrenchment compensation]
+
+  - id: bond
+    label: Employment bond or training cost recovery
+    concern: lockin
+    severityIfMissing: low
+    whyItMatters: A bond requires you to pay the company if you leave early. Their absence is good news, so this check confirms you are not bonded.
+    ifMissingAsk: Confirm in writing that there is no bond or training cost recovery.
+    queries: ["employment bond minimum service period", "training cost recovery on early exit", "liquidated damages if employee leaves"]
+    keywords: [bond, minimum service, liquidated damages, training cost, service agreement]
+
+  - id: non_compete
+    label: Non-compete after you leave
+    concern: future_work
+    severityIfMissing: low
+    whyItMatters: Restricts where you can work after leaving. Its absence is good news; this check confirms it.
+    ifMissingAsk: Confirm there is no post-employment restriction on where I can work.
+    queries: ["shall not join competitor after termination", "non-compete restriction period"]
+    keywords: [non-compete, competing business, shall not engage, competitor]
+
+  - id: non_solicit
+    label: Non-solicitation of employees and clients
+    concern: future_work
+    severityIfMissing: low
+    whyItMatters: Usually enforceable and reasonable, but you should know its duration before you plan a move with colleagues.
+    ifMissingAsk: How long does the non-solicitation last and does it cover clients I never worked with?
+    queries: ["shall not solicit employees or clients", "non-solicitation period"]
+    keywords: [solicit, induce, entice away]
+
+  - id: confidentiality
+    label: Confidentiality and how long it lasts
+    concern: ip
+    severityIfMissing: medium
+    whyItMatters: Perpetual confidentiality on broadly defined information can restrict what you say about your own work for the rest of your career.
+    ifMissingAsk: What exactly counts as confidential, and does the obligation end?
+    queries: ["confidential information obligations", "shall not disclose proprietary information"]
+    keywords: [confidential, proprietary, non-disclosure]
+
+  - id: ip_assignment
+    label: Who owns what you create
+    concern: ip
+    severityIfMissing: high
+    whyItMatters: Broad assignment clauses can capture work you do on weekends on your own machine.
+    ifMissingAsk: Is IP assignment limited to work done in the course of employment and using company resources?
+    queries: ["assignment of intellectual property to company", "inventions and works made during employment"]
+    keywords: [intellectual property, inventions, assign, works, copyright]
+
+  - id: prior_inventions
+    label: Carve-out for work you already own
+    concern: ip
+    severityIfMissing: high
+    whyItMatters: Without a carve-out, your existing side projects and open-source work can be swept into company ownership.
+    ifMissingAsk: Can we add a schedule listing my existing projects as excluded from IP assignment?
+    queries: ["prior inventions excluded from assignment", "pre-existing intellectual property of employee"]
+    keywords: [prior invention, pre-existing, excluded works, Schedule of inventions]
+
+  - id: moonlighting
+    label: Side projects and outside work
+    concern: future_work
+    severityIfMissing: medium
+    whyItMatters: Determines whether freelancing, teaching or open-source contribution is a breach of contract.
+    ifMissingAsk: Is written permission needed for unpaid open-source or teaching work?
+    queries: ["shall not engage in other employment or business", "exclusivity of service"]
+    keywords: [moonlighting, other employment, whole time, exclusively]
+
+  - id: hours
+    label: Working hours, shifts and on-call
+    concern: pay
+    severityIfMissing: medium
+    whyItMatters: Open-ended availability clauses with no overtime provision mean unlimited unpaid hours.
+    ifMissingAsk: What are the standard hours, and is there compensation for on-call or night shifts?
+    queries: ["working hours and shift timings", "employee may be required to work additional hours"]
+    keywords: [working hours, shift, overtime, on-call, roster]
+
+  - id: leave
+    label: Leave entitlement
+    concern: pay
+    severityIfMissing: medium
+    whyItMatters: Leave types, carry-forward and encashment rules decide what you actually get and what you lose on exit.
+    ifMissingAsk: How many days of each leave type, and is unused leave carried forward or encashed?
+    queries: ["annual leave entitlement and carry forward", "casual sick and earned leave"]
+    keywords: [leave, holiday, vacation, encashment, carry forward]
+
+  - id: statutory_benefits
+    label: PF, gratuity and insurance
+    concern: pay
+    severityIfMissing: medium
+    whyItMatters: These are significant parts of total compensation and should be stated rather than assumed.
+    ifMissingAsk: Are PF, gratuity and medical insurance applicable, and are they inside or on top of my CTC?
+    queries: ["provident fund gratuity and insurance benefits", "statutory benefits applicable"]
+    keywords: [provident fund, PF, gratuity, ESIC, insurance, mediclaim]
+
+  - id: location_transfer
+    label: Work location and transfer rights
+    concern: exit
+    severityIfMissing: medium
+    whyItMatters: A broad transfer clause can move you to another city with little notice, and refusing may count as resignation.
+    ifMissingAsk: Can I be transferred to another city, and what notice and support would I get?
+    queries: ["place of posting and transfer to any location", "company may transfer the employee"]
+    keywords: [transfer, posting, location, deputation, branch]
+
+  - id: governing_law
+    label: Governing law, jurisdiction and arbitration
+    concern: exit
+    severityIfMissing: medium
+    whyItMatters: Decides which city you would have to litigate or arbitrate in if something goes wrong, which is a real cost.
+    ifMissingAsk: Which courts have jurisdiction, and where would arbitration be seated?
+    queries: ["governing law and exclusive jurisdiction of courts", "disputes referred to arbitration seated at"]
+    keywords: [jurisdiction, governing law, arbitration, courts at]
+
+  - id: amendment
+    label: How the contract can be changed
+    concern: exit
+    severityIfMissing: medium
+    whyItMatters: A clause letting the company change terms unilaterally makes every other clause provisional.
+    ifMissingAsk: Can terms be changed without my written consent?
+    queries: ["company reserves the right to amend the terms", "policies may be modified at the discretion of the company"]
+    keywords: [amend, modify, sole discretion, reserves the right, vary]
+
+  - id: exit_process
+    label: Full and final settlement and relieving letter
+    concern: exit
+    severityIfMissing: high
+    whyItMatters: Without stated timelines, your relieving letter and final settlement can be delayed, which blocks your next job.
+    ifMissingAsk: Within how many days of my last day will I receive the relieving letter and full and final settlement?
+    queries: ["full and final settlement on separation", "relieving letter and experience certificate", "handover and clearance on exit"]
+    keywords: [full and final, relieving letter, clearance, settlement, handover]

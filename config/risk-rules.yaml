@@ -1,0 +1,120 @@
+rules:
+  - id: long_notice
+    when: "noticePeriodEmployee.value > 90"
+    severity: high
+    concern: exit
+    title: "You must give {noticePeriodEmployee.value} days notice to resign"
+    explanation: "Most new employers expect you to join within 30 to 60 days. A longer notice period can cost you offers."
+    benchmark: "Common range in Indian tech roles: 30–90 days"
+    suggestedQuestion: "Can the notice period be reduced to 60 days, or can I buy out the balance?"
+    evidenceFrom: noticePeriodEmployee
+
+  - id: asymmetric_notice
+    when: "noticePeriodEmployer.value < noticePeriodEmployee.value"
+    severity: high
+    concern: termination
+    title: "The company can end your employment faster than you can leave"
+    explanation: "You must give {noticePeriodEmployee.value} days; the company only gives {noticePeriodEmployer.value}."
+    suggestedQuestion: "Can the notice periods be made equal for both sides?"
+    evidenceFrom: [noticePeriodEmployee, noticePeriodEmployer]
+
+  - id: bond_penalty
+    when: "bondPresent.value == true and bondPenaltyAmount.value != null"
+    severity: high
+    concern: lockin
+    title: "You owe money if you leave early"
+    explanation: "Leaving before the bond period ends triggers a payment of {bondPenaltyAmount.value}."
+    legalNote: "Indian courts have treated recovery of genuine, documented training costs differently from penalties. Whether an amount is enforceable depends on the facts — worth confirming with a lawyer before signing."
+    suggestedQuestion: "What actual training costs does this amount represent, and does it reduce over the bond period?"
+    evidenceFrom: [bondPresent, bondPenaltyAmount]
+
+  - id: long_bond
+    when: "bondDurationMonths.value > 24"
+    severity: high
+    concern: lockin
+    title: "Long lock-in period of {bondDurationMonths.value} months"
+    explanation: "You are committing a substantial part of your early career before you know whether the role suits you."
+    suggestedQuestion: "Can the bond period be shortened, or the amount pro-rated month by month?"
+    evidenceFrom: bondDurationMonths
+
+  - id: non_compete_long
+    when: "nonCompeteMonths.value > 12"
+    severity: medium
+    concern: future_work
+    title: "{nonCompeteMonths.value}-month restriction on joining competitors"
+    explanation: "This clause would restrict where you can work after leaving."
+    legalNote: "Section 27 of the Indian Contract Act, 1872 makes agreements in restraint of trade void, and Indian courts have generally declined to enforce post-employment non-competes. A clause can still be signed, and disputes still cost time and money — confirm the position with a lawyer."
+    suggestedQuestion: "Is this restriction limited to named competitors and a defined role, and how would it be enforced?"
+    evidenceFrom: nonCompeteMonths
+
+  - id: unilateral_amendment
+    when: "unilateralAmendment.value == true"
+    severity: medium
+    concern: exit
+    title: "The company can change these terms without your consent"
+    explanation: "A clause allowing unilateral amendment means the terms you are reviewing today can change later."
+    suggestedQuestion: "Can changes to material terms require my written agreement?"
+    evidenceFrom: unilateralAmendment
+
+  - id: uncapped_indemnity
+    when: "indemnityUncapped.value == true"
+    severity: high
+    concern: termination
+    title: "Your financial liability has no stated limit"
+    explanation: "An indemnity without a cap means there is no written ceiling on what you could be asked to pay."
+    suggestedQuestion: "Can liability be capped at a fixed amount, and limited to wilful misconduct?"
+    evidenceFrom: indemnityUncapped
+
+  - id: no_prior_inventions
+    when: "ipAssignmentPresent.value == true and priorInventionsCarveOut.value != true"
+    severity: high
+    concern: ip
+    title: "Your existing side projects may be covered by the IP clause"
+    explanation: "The agreement assigns intellectual property to the company but does not carve out work you created before joining."
+    suggestedQuestion: "Can we attach a schedule listing my existing projects as excluded?"
+    evidenceFrom: ipAssignmentPresent
+
+  - id: variable_forfeit
+    when: "variablePayForfeitOnExit.value == true"
+    severity: medium
+    concern: pay
+    title: "Variable pay is forfeited if you resign before the payout"
+    explanation: "Part of the CTC you were quoted is conditional on still being employed on the payout date."
+    suggestedQuestion: "Is variable pay pro-rated if I leave partway through the year?"
+    evidenceFrom: variablePayForfeitOnExit
+
+  - id: termination_no_notice
+    when: "terminationWithoutNoticeByEmployer.value == true"
+    severity: high
+    concern: termination
+    title: "The company can terminate you immediately in some situations"
+    explanation: "There are stated circumstances in which employment ends with no notice and no payment in lieu."
+    suggestedQuestion: "Which specific situations allow immediate termination, and is there a process before it applies?"
+    evidenceFrom: terminationWithoutNoticeByEmployer
+
+  - id: long_probation
+    when: "probationMonths.value > 6"
+    severity: medium
+    concern: termination
+    title: "Probation lasts {probationMonths.value} months"
+    explanation: "Notice periods and protections are usually weaker during probation, so a long probation extends that exposure."
+    suggestedQuestion: "Is confirmation automatic at the end of probation, or does it require a letter?"
+    evidenceFrom: probationMonths
+
+  - id: distant_arbitration
+    when: "arbitrationSeat.value != null"
+    severity: medium
+    concern: exit
+    title: "Disputes would be heard in {arbitrationSeat.value}"
+    explanation: "If a dispute arises, this is where you would have to pursue it, which affects the practical cost of doing so."
+    suggestedQuestion: "Can the seat be changed to my place of work?"
+    evidenceFrom: arbitrationSeat
+
+  - id: injection_text
+    when: "special:injection_detected"
+    severity: info
+    concern: ip
+    title: "This document contains text that appears aimed at automated readers"
+    explanation: "One or more clauses contain phrasing designed to influence AI tools reading the document. It has been ignored, and you should read that section yourself."
+    suggestedQuestion: "Why does this document contain instructions addressed to software?"
+    evidenceFrom: special
