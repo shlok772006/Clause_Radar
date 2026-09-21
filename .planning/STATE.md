@@ -4,15 +4,15 @@
 
 - **Milestone:** v1.0
 - **Current Phase:** 1 (The Spine)
-- **Phase Status:** planned
-- **Last Action:** plan-phase 1 completed — 5 waves, 6 tasks, verified
-- **Next Action:** `/gsd:execute-phase 1` → build the code
+- **Phase Status:** complete
+- **Last Action:** execute-phase 1 complete — all 5 waves executed and verified
+- **Next Action:** Phase 2 (Grounding and Refusal)
 
 ## Phase Progress
 
 | Phase | Name | Status | Day |
 |---|---|---|---|
-| 1 | The Spine | planned | 1 |
+| 1 | The Spine | complete | 1 |
 | 2 | Grounding and Refusal | not_started | 2 |
 | 3 | The Differentiator | not_started | 3 |
 | 4 | Score and Ship | not_started | 4 |
@@ -33,3 +33,4 @@
 | Timestamp | Action | Outcome |
 |---|---|---|
 | 2026-09-21 12:02 | GSD onboard + ingest-docs | .planning/ bootstrapped from 12 docs + AGENTS.md |
+| 2026-09-21 16:47 | GSD execute-phase 1 | All 5 waves complete: PDF parsing, segmentation, viewer, ingest API, review page, end-to-end verified |
