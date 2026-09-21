@@ -1,0 +1,67 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-paper: #FBFBF9;
+  --color-ink: #16202B;
+  --color-ink-soft: #55606B;
+  --color-rule: #DCDFD9;
+  --color-marker: #F2D14E;
+  --color-flag: #B3402E;
+  --color-verified: #2F6F5E;
+
+  --font-sans: 'Instrument Sans', system-ui, sans-serif;
+  --font-serif: 'Source Serif 4', Georgia, serif;
+
+  --text-xs: 0.8125rem;
+  --text-sm: 0.9375rem;
+  --text-base: 1.0625rem;
+  --text-lg: 1.3125rem;
+  --text-xl: 1.75rem;
+  --text-2xl: 2.375rem;
+}
+
+:root {
+  --paper: #FBFBF9;
+  --ink: #16202B;
+  --ink-soft: #55606B;
+  --rule: #DCDFD9;
+  --marker: #F2D14E;   /* highlighter — evidence ONLY */
+  --flag: #B3402E;     /* risk findings only */
+  --verified: #2F6F5E; /* verification passed */
+
+  --font-sans: 'Instrument Sans', system-ui, sans-serif;
+  --font-serif: 'Source Serif 4', Georgia, serif;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--ink);
+  background-color: var(--paper);
+  line-height: 1.55;
+  margin: 0;
+  padding: 0;
+}
+
+/* Highlight sweep animation (Task 1.5) */
+.clause-highlight {
+  background-color: var(--marker);
+  border-radius: 2px;
+  padding: 2px 0;
+  animation: highlight-sweep 400ms ease-out;
+}
+
+@keyframes highlight-sweep {
+  from {
+    background-color: rgba(242, 209, 78, 0.2);
+  }
+  to {
+    background-color: #F2D14E;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .clause-highlight {
+    animation: none;
+  }
+}
