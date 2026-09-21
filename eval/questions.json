@@ -1,0 +1,77 @@
+[
+  {
+    "id": "q01",
+    "fixture": "test-agreement",
+    "question": "What is my notice period?",
+    "type": "answerable",
+    "expectedValue": "60 days",
+    "expectedClauseNumber": "8.1"
+  },
+  {
+    "id": "q02",
+    "fixture": "test-agreement",
+    "question": "Is there an employment service bond?",
+    "type": "answerable",
+    "expectedValue": "24 months",
+    "expectedClauseNumber": "11.3"
+  },
+  {
+    "id": "q03",
+    "fixture": "test-agreement",
+    "question": "How much is the penalty if I leave during the bond period?",
+    "type": "answerable",
+    "expectedValue": "150000 INR",
+    "expectedClauseNumber": "11.3"
+  },
+  {
+    "id": "q04",
+    "fixture": "test-agreement",
+    "question": "Can I work on external freelancing or moonlight?",
+    "type": "answerable",
+    "expectedValue": "restricted / prior written consent required",
+    "expectedClauseNumber": "6.1"
+  },
+  {
+    "id": "q05",
+    "fixture": "test-agreement",
+    "question": "Who owns intellectual property and inventions I develop?",
+    "type": "answerable",
+    "expectedValue": "assigned to company",
+    "expectedClauseNumber": "5.1"
+  },
+  {
+    "id": "q06",
+    "fixture": "test-agreement",
+    "question": "What happens to my stock options or equity if I resign?",
+    "type": "unanswerable",
+    "reason": "Agreement is silent on stock options or equity"
+  },
+  {
+    "id": "q07",
+    "fixture": "test-agreement",
+    "question": "Can I work remotely from another state or abroad?",
+    "type": "unanswerable",
+    "reason": "Agreement does not specify remote work or relocation"
+  },
+  {
+    "id": "q08",
+    "fixture": "test-agreement",
+    "question": "What is the maternity or paternity leave entitlement?",
+    "type": "unanswerable",
+    "reason": "Agreement does not state parental leave terms"
+  },
+  {
+    "id": "q09",
+    "fixture": "test-agreement",
+    "question": "Do I get a company laptop allowance or hardware budget?",
+    "type": "unanswerable",
+    "reason": "Agreement is silent on hardware allowances"
+  },
+  {
+    "id": "q10",
+    "fixture": "test-agreement",
+    "question": "Is there an annual appraisal or guaranteed bonus schedule?",
+    "type": "unanswerable",
+    "reason": "Agreement does not state appraisal cycle"
+  }
+]

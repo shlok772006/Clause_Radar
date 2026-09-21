@@ -259,6 +259,7 @@ export default function ReviewPage({ params }: { params: Promise<{ sessionId: st
           }`}
         >
           <FindingsPane
+            sessionId={sessionId}
             clauses={clauses}
             selectedClauseId={selectedClauseId}
             onSelectClause={handleSelectClause}
