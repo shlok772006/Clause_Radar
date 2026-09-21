@@ -1,0 +1,224 @@
+# GSD (Get Ship Done) — Command Reference for Clause_Radar
+
+GSD is a meta-prompting and spec-driven development system for AI coding agents. Commands are invoked **inside your AI agent** as slash commands (e.g., `/gsd:plan-phase 1`), NOT as shell/PowerShell commands.
+
+---
+
+## Table of Contents
+
+1. [Project Initialization](#1-project-initialization)
+2. [Phase Pipeline — The Core Build Loop](#2-phase-pipeline--the-core-build-loop)
+3. [Quick Tasks & Explorations](#3-quick-tasks--explorations)
+4. [Quality, Review & Audit](#4-quality-review--audit)
+5. [Milestone & Project Management](#5-milestone--project-management)
+6. [Session & Context Management](#6-session--context-management)
+7. [Infrastructure & Operations](#7-infrastructure--operations)
+8. [Namespace Router Commands](#8-namespace-router-commands)
+9. [AI Integration & Advanced](#9-ai-integration--advanced)
+10. [Clause_Radar — Day-by-Day Command Map](#10-clause_radar--day-by-day-command-map)
+
+---
+
+## 1. Project Initialization
+
+| Command | When to use it |
+|---------|---------------|
+| `/gsd:new-project` | **Starting a brand-new project from scratch.** Runs questioning → research → requirements → roadmap. Creates `.planning/PROJECT.md`, `REQUIREMENTS.md`, `ROADMAP.md`, `STATE.md`. Use on Day 1 of a greenfield project. |
+| `/gsd:new-milestone` | **Starting a new milestone within an existing project.** Equivalent to new-project but preserves PROJECT.md history. Use when you've completed a milestone and are beginning the next (e.g., v1.0 done, starting v1.1). |
+| `/gsd:onboard` | **Bringing an existing codebase into GSD.** Brownfield projects — maps the codebase, ingests existing docs, sets up `.planning/`, produces an onboarding summary. Use when you inherit a project that has code but no `.planning/` folder. |
+| `/gsd:import` | **Importing an external plan file** (e.g., a PRD from another tool) into GSD with conflict detection against existing PROJECT.md decisions. Use `--from <filepath>` for files, `--from-gsd2` to reverse-migrate a GSD v2 project. |
+| `/gsd:ingest-docs` | **Bootstrapping `.planning/` from multiple existing documents** (ADRs, PRDs, SPECs) in one pass. Auto-synthesizes conflicts using precedence `ADR > SPEC > PRD > DOC`. Use when you have a folder of planning docs and want GSD to ingest them all. |
+| `/gsd:map-codebase` | **Analyzing an existing codebase** with parallel mapper agents to produce 7 structured documents in `.planning/codebase/` (STACK, ARCHITECTURE, STRUCTURE, CONVENTIONS, TESTING, INTEGRATIONS, CONCERNS). Use before onboarding or after significant refactoring. |
+
+---
+
+## 2. Phase Pipeline — The Core Build Loop
+
+This is the main execution path. Every feature goes through this cycle per phase:
+
+```
+discuss-phase → spec-phase → plan-phase → execute-phase → verify-work
+```
+
+| Command | When to use it |
+|---------|---------------|
+| `/gsd:discuss-phase <N>` | **Before planning a phase.** Gathers implementation decisions through adaptive questioning. Produces `<N>-CONTEXT.md` so downstream agents don't need to ask you again. Use at the start of every phase. |
+| `/gsd:spec-phase <N>` | **Clarifying WHAT a phase delivers** before discuss-phase. Socratic questioning with ambiguity scoring. Produces SPEC.md with falsifiable requirements. Use when requirements are ambiguous or you want measurable acceptance criteria. |
+| `/gsd:plan-phase <N>` | **Creating PLAN.md** for a phase. Researches domain, spawns planner, verifies with plan-checker, iterates until pass. Use after discuss-phase produces acceptable CONTEXT.md. |
+| `/gsd:execute-phase <N>` | **Running all plans in a phase** with wave-based parallel execution via subagents. Use when PLAN.md files are ready. Optional `--wave N` to run one wave at a time, `--gaps-only` for fix plans, `--interactive` for pair-programming style. |
+| `/gsd:verify-work <N>` | **Validating built features** through conversational UAT. Tests one at a time, plain text. Produces `<N>-UAT.md`. Use after execute-phase completes. |
+| `/gsd:validate-phase <N>` | **Auditing Nyquist validation gaps** for a completed phase. Produces VALIDATION.md + test files. Use when you need deep validation coverage beyond UAT. |
+| `/gsd:add-tests <N>` | **Generating unit and E2E tests** for a completed phase based on SUMMARY.md, CONTEXT.md, VERIFICATION.md. Uses RED-GREEN conventions. Use after verify-work passes. |
+| `/gsd:autonomous` | **Running all remaining phases with no human in the loop.** Discuss → plan → execute per phase. Pauses only for user decisions. Use when you want the agent to drive an entire milestone end-to-end. |
+| `/gsd:mvp-phase <N>` | **Planning a phase as a vertical MVP slice.** Prompts for user story, runs SPIDR splitting check, writes mode=MVP to ROADMAP.md. Use for Day 1-style vertical feature slices. |
+| `/gsd:plan-review-convergence <N>` | **Cross-AI plan convergence loop.** Repeatedly: plan-phase → external AI review → replan → re-review until no unresolved concerns. Use for critical phases where you want multiple AI perspectives. |
+| `/gsd:ultraplan-phase <N>` | **Offload planning to Claude Code's ultraplan cloud.** Beta. Use when local planning is too expensive and you have a Claude Code subscription. |
+| `/gsd:phase` | **Managing phases in ROADMAP.md** — add, insert, remove, or edit phases. Use `--insert` for urgent work as decimal phase (e.g., 72.1), `--remove` to delete a future phase, `--edit` to modify phase fields. |
+
+---
+
+## 3. Quick Tasks & Explorations
+
+| Command | When to use it |
+|---------|---------------|
+| `/gsd:quick` | **Small, ad-hoc tasks with GSD guarantees** (atomic commits, STATE.md tracking) but skipping optional agents. Use for typo fixes, config changes, small refactors. Subcommands: `list`, `status <slug>`, `resume <slug>`. Flags: `--full` (full pipeline), `--discuss`, `--research`, `--validate`. |
+| `/gsd:fast` | **Trivial tasks inline** — no subagents, no planning overhead. Use for tasks you could describe in one sentence and execute in under 2 minutes. Faster than `/gsd:quick` but without commit tracking. |
+| `/gsd:quick-batch` | **Batching several `/gsd:quick`-shaped tasks together.** One coordinator dispatches per-item planner/researcher/checker/executor/verifier. Use when you have 3+ small independent tasks to run in parallel. |
+| `/gsd:capture` | **Capturing ideas, tasks, notes, and seeds** to their destination. Modes: default (todo), `--note` (zero-friction idea), `--backlog` (parking lot), `--seed` (forward-looking idea), `--list` (browse todos), `--list-seeds` (audit seeds). |
+| `/gsd:explore` | **Open-ended Socratic ideation.** Think through ideas before committing to plans. Use when you're exploring what to build or how to approach a problem. |
+| `/gsd:spike` | **Time-boxed technical spike.** Build focused experiments to validate feasibility. Produces verified knowledge for the real build. Use when you need to research a library, test an approach, or validate a technical decision. |
+| `/gsd:sketch` | **Sketching UI/design ideas** with throwaway HTML mockups. Produces 2-3 variants. Use before committing to an implementation for any UI feature. |
+
+---
+
+## 4. Quality, Review & Audit
+
+| Command | When to use it |
+|---------|---------------|
+| `/gsd:code-review <N>` | **Reviewing source files** changed during a phase for bugs, security, and code quality. Produces `<N>-REVIEW.md`. Depth: `--depth=quick|standard|deep`. Use after execute-phase. |
+| `/gsd:review <N>` | **Cross-AI peer review** of phase plans from external AI CLIs (Gemini, Claude, Codex, OpenCode, Qwen, Cursor). Produces REVIEWS.md. Use after plan-phase to get external validation before execution. |
+| `/gsd:review-backlog` | **Reviewing 999.x backlog items** and optionally promoting them to active milestone or removing stale entries. Use periodically to keep backlog healthy. |
+| `/gsd:audit-uat` | **Cross-phase audit** of all outstanding UAT and verification items. Scans all phases for pending/skipped/blocked items. Use at milestone boundaries. |
+| `/gsd:audit-milestone <version>` | **Verifying milestone completion** against original intent. Checks requirements coverage, cross-phase integration, E2E flows. Run BEFORE completing a milestone. |
+| `/gsd:audit-fix` | **Autonomous audit-to-fix pipeline.** Runs audit, classifies findings as auto-fixable vs manual, fixes auto-fixable with test verification. Use after audit-uat finds issues. |
+| `/gsd:secure-phase <N>` | **Retroactive security review** of a completed phase. Verifies threat mitigations. Produces SECURITY.md. Use for phases handling sensitive data (Clause_Radar: PDF upload, API keys). |
+| `/gsd:eval-review <N>` | **Auditing AI phase evaluation coverage.** Checks whether eval strategy from AI-SPEC.md was implemented. Produces EVAL-REVIEW.md with score, verdict, gaps, remediation. |
+| `/gsd:ui-phase <N>` | **Generating UI design contract** (UI-SPEC.md) for frontend phases. Orchestrates UI researcher + checker. Use for any UI-heavy phase. |
+| `/gsd:ui-review <N>` | **Retroactive 6-pillar visual audit** of implemented frontend. Produces UI-REVIEW.md with graded assessment. |
+
+---
+
+## 5. Milestone & Project Management
+
+| Command | When to use it |
+|---------|---------------|
+| `/gsd:complete-milestone <version>` | **Archiving a completed milestone.** Verifies requirements, gathers stats, extracts accomplishments, archives to `.planning/milestones/`, updates PROJECT.md, tags git. Use when all phases in a milestone are done. |
+| `/gsd:milestone-summary <version>` | **Generating a comprehensive project summary** for team onboarding and review. Produces MILESTONE_SUMMARY.md. Use when documenting what was shipped. |
+| `/gsd:progress` | **Checking project progress** — shows status, summarizes recent work, intelligently routes to the next action. Subcommands: `--next` (auto-advance), `--do "task"` (smart dispatch), `--forensic` (integrity audit). Use frequently to stay oriented. |
+| `/gsd:stats` | **Displaying project statistics** — phases, plans, requirements, git metrics, timeline. Use for status reports or checking how much work remains. |
+| `/gsd:manager` | **Interactive command center** for managing multiple phases from one terminal. Shows dashboard, recommends next actions, dispatches work. Use for power users managing parallel work. |
+| `/gsd:workstreams` | **Managing parallel workstreams** — list, create, switch, status, progress, complete, resume. Use when working on multiple independent features/milestones simultaneously. |
+| `/gsd:next` | **Smart entry point.** Detects project state, presents a menu of the right next action, dispatches to it. Use when you're not sure what to do next. |
+
+---
+
+## 6. Session & Context Management
+
+| Command | When to use it |
+|---------|---------------|
+| `/gsd:pause-work` | **Creating a context handoff** when pausing mid-phase. Creates `.continue-here.md` with complete state, commits as WIP. Use when you need to stop mid-session. |
+| `/gsd:resume-work` | **Resuming from a previous session.** Restores STATE.md, detects checkpoints, finds incomplete work, routes to next action. Use when starting a new session. |
+| `/gsd:thread` | **Managing persistent context threads** for cross-session work that doesn't belong to a specific phase. Use for ongoing investigations or topics spanning multiple sessions. |
+| `/gsd:health` | **Diagnosing planning directory health.** Checks for missing files, invalid configs, inconsistent state. Use `--repair` to auto-fix, `--context` to check context utilization. |
+| `/gsd:undo` | **Safe git revert** of phase or plan commits. Uses phase manifest with dependency checks. Modes: `--last N`, `--phase NN`, `--plan NN-MM`. Use when you need to roll back GSD artifacts. |
+| `/gsd:debug` | **Systematic debugging** with persistent state across context resets. Subcommands: `list`, `status <slug>`, `continue <slug>`, `--diagnose`. Use when a feature doesn't work as expected. |
+| `/gsd:forensics` | **Post-mortem investigation** for failed GSD workflows. Analyzes git history, planning artifacts, produces structured diagnostic report. Use when a workflow broke and you need to understand why. |
+| `/gsd:surface` | **Managing which skills are surfaced** — apply a profile, list, disable/enable clusters. Use to control which GSD capabilities are visible in your agent. |
+| `/gsd:settings` | **Configuring GSD workflow toggles** and model profile. Use to set research/plan-check/verifier preferences, code review depth, worktree settings, etc. |
+| `/gsd:update` | **Updating GSD to latest version.** Shows changelog, installs if available. Use `--sync` for multi-runtime sync, `--reapply` for restoring customizations after update. |
+
+---
+
+## 7. Infrastructure & Operations
+
+| Command | When to use it |
+|---------|---------------|
+| `/gsd:docs-update` | **Generating/updating project documentation** verified against the codebase. Produces up to 9 doc files. Use `--force` to regenerate all, `--verify-only` to check accuracy without writing. |
+| `/gsd:graphify` | **Building/querying the project knowledge graph** in `.planning/graphs/`. Modes: `build`, `query <term>`, `status`, `diff`. Use for understanding codebase relationships or querying project knowledge. |
+| `/gsd:mempalace-recall` | **Recalling prior decisions, patterns, and surprises** from MemPalace before planning. Read-only. Use before discuss-phase to leverage historical context. |
+| `/gsd:mempalace-capture` | **Filing phase artifacts into MemPalace** with temporal KG mirroring. Use after completing a phase to preserve institutional knowledge. |
+| `/gsd:pr-branch` | **Creating a clean PR branch** by filtering out `.planning/` commits. Reviewers see only code changes. Use when preparing code for peer review. |
+| `/gsd:inbox` | **Triaging GitHub issues and PRs** against project templates. Use for open-source projects with active GitHub inboxes. |
+| `/gsd:workspace` | **Managing isolated workspaces** — create, list, remove. Use for parallel work in clean environments. |
+
+---
+
+## 8. Namespace Router Commands
+
+These are traffic-cop commands that route to the appropriate specialized command based on user intent:
+
+| Command | Routes to | When used |
+|---------|-----------|-----------|
+| `/gsd:help` | Lists all available commands | **Use when you need a refresher on what GSD can do.** |
+| `/gsd:next` | Smart entry router | **Default starting point** when unsure what to do. |
+| `/gsd:progress` | Progress check + routing | **Check status** at any time. |
+| `/gsd:ns-project` | new-project, onboard, new-milestone, complete-milestone, audit-milestone, etc. | **Project lifecycle questions.** |
+| `/gsd:ns-workflow` | discuss-phase, spec-phase, plan-phase, execute-phase, verify-work, phase, progress, autonomous, etc. | **Phase pipeline questions.** |
+| `/gsd:ns-review` | code-review, audit-uat, secure-phase, eval-review, ui-review, debug, forensics, etc. | **Quality/review/debug questions.** |
+| `/gsd:ns-manage` | config, workspace, workstreams, thread, update, ship, pause-work, health, manager, settings, stats, etc. | **Management/operations questions.** |
+| `/gsd:ns-context` | map-codebase, graphify, docs-update, extract-learnings, mempalace-* | **Codebase intelligence questions.** |
+| `/gsd:ns-ideate` | explore, sketch, spike, spec-phase, capture | **Exploration/capture questions.** |
+| `/gsd:help` | Full command guide | **First command to run when starting fresh.** |
+
+---
+
+## 9. AI Integration & Advanced
+
+| Command | When to use it |
+|---------|---------------|
+| `/gsd:ai-integration-phase <N>` | **Creating an AI-SPEC.md design contract** for phases that involve building AI systems. Selects framework, researches docs/domain, designs eval strategy. Use for phases building AI features (Clause_Radar: PDF parsing, Gemini integration, verification engine). |
+| `/gsd:mvp-phase <N>` | **Planning as vertical MVP slice** with user story + SPIDR splitting. |
+| `/gsd:discuss-phase <N>` (with `--assumptions`) | **Assumption-based discussion mode.** Lists phase assumptions for review instead of standard questioning. |
+
+---
+
+## 10. Clause_Radar — Day-by-Day Command Map
+
+Based on `docs/10-BUILD-PLAN.md`:
+
+### Day 1 — The Spine
+| Task | GSD Command |
+|------|-------------|
+| Scaffold project, design tokens | `/gsd:next` (auto-route) or `/gsd:plan-phase 1` after setup |
+| PDF text extraction, clause segmentation | `/gsd:execute-phase 1` |
+| Document viewer with click-to-highlight | `/gsd:execute-phase 1` (continued) |
+| `/api/ingest` + upload UI | `/gsd:execute-phase 1` (continued) |
+| **Verification**: upload → parse → render → highlight | `/gsd:verify-work 1` |
+
+### Day 2 — Grounding and Refusal
+| Task | GSD Command |
+|------|-------------|
+| Prompt templates P1/P2 + verifier | `/gsd:plan-phase 2` |
+| `/api/ask` endpoint | `/gsd:execute-phase 2` |
+| ClaimCard, RefusalCard, AskPanel UI | `/gsd:execute-phase 2` |
+| Extraction + injection detection | `/gsd:execute-phase 2` (continued) |
+| **Verification**: ask question → verified answer or refusal | `/gsd:verify-work 2` |
+
+### Day 3 — The Differentiator
+| Task | GSD Command |
+|------|-------------|
+| Config files (rubric, risk rules) | `/gsd:fast` (copy config files) |
+| Embeddings + rubric matching | `/gsd:plan-phase 3` |
+| Risk rules engine | `/gsd:execute-phase 3` |
+| ConcernPicker + ranking, RiskDashboard | `/gsd:execute-phase 3` |
+| Extend `/api/ingest` with full pipeline | `/gsd:execute-phase 3` (continued) |
+| **Verification**: missing-clause report + risk dashboard working | `/gsd:verify-work 3` |
+
+### Day 4 — Score and Ship
+| Task | GSD Command |
+|------|-------------|
+| `/api/explain`, `/api/act`, `/api/translate`, `/api/speak` | `/gsd:plan-phase 4` → `/gsd:execute-phase 4` |
+| Accessibility pass | `/gsd:code-review 4` + `/gsd:ui-review 4` |
+| Security pass | `/gsd:secure-phase 4` |
+| Eval harness | `/gsd:eval-review 4` |
+| Deploy to Cloud Run | `/gsd:pr-branch` then deploy |
+| **Verification**: full flow on deployed URL | `/gsd:verify-work 4` |
+
+### Day 5 — Prove It
+| Task | GSD Command |
+|------|-------------|
+| Three-contract regression | `/gsd:verify-work 4` (extended) |
+| Video recording | Manual (not GSD) |
+| Final submission | `/gsd:complete-milestone 1.0` |
+
+---
+
+## Key Rules
+
+1. **Always run `/gsd:help` first** if unsure.
+2. **`/gsd:next` is your default entry** — it detects project state and routes to the right command.
+3. **Discuss → Spec → Plan → Execute → Verify** is the canonical phase flow.
+4. **Never skip verify-work** — it confirms built features actually work.
+5. **Pause/resume** — use `/gsd:pause-work` and `/gsd:resume-work` for clean session handoffs.
+6. **Capture everything** — use `/gsd:capture` for ideas, todos, seeds, and notes so nothing is lost between sessions.
+7. **Every claim in Clause_Radar must be verified** — use the verifier pattern: generate → verify → discard if unverified (per AGENTS.md rule 1).
