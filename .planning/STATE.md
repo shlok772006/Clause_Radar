@@ -4,9 +4,9 @@
 
 - **Milestone:** v1.0
 - **Current Phase:** 4 (Score and Ship)
-- **Phase Status:** executed
-- **Last Action:** execute-phase 4 complete — all 3 waves implemented, 60 tests pass, build green
-- **Next Action:** `/gsd-verify-work 4` → Verify Phase 4 features in browser
+- **Phase Status:** complete
+- **Last Action:** verify-work 4 complete — all 9 UAT scenarios verified in browser & recorded in 4-UAT.md
+- **Next Action:** `/gsd-discuss-phase 5` → Discuss Phase 5 (Prove It: 3-contract regression, demo video & submission)
 
 ## Phase Progress
 
@@ -15,7 +15,7 @@
 | 1 | The Spine | complete | 1 |
 | 2 | Grounding and Refusal | complete | 2 |
 | 3 | The Differentiator | complete | 3 |
-| 4 | Score and Ship | executed | 4 |
+| 4 | Score and Ship | complete | 4 |
 | 5 | Prove It | not_started | 5 |
 
 ## Active Decisions
