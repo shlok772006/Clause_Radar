@@ -252,7 +252,7 @@ function verifySingleField<T>(
  * Verifies all 20 P1 extracted fields against document clauses.
  */
 export function verifyExtractedFields(raw: RawFields, clauses: Clause[]): VerifiedFields {
-  const verified: Partial<RawFields> = {};
+  const verified: Record<string, ExtractedField<unknown>> = {};
   const discarded: string[] = [];
   let checked = 0;
 
@@ -264,15 +264,15 @@ export function verifyExtractedFields(raw: RawFields, clauses: Clause[]): Verifi
 
     const res = verifySingleField(field as ExtractedField<unknown>, clauses);
     if (res.valid) {
-      verified[key] = res.verified as any;
+      verified[key] = res.verified;
     } else {
-      verified[key] = res.verified as any;
+      verified[key] = res.verified;
       discarded.push(key);
     }
   }
 
   return {
-    ...(verified as RawFields),
+    ...(verified as unknown as RawFields),
     __verification: {
       checked,
       discarded,

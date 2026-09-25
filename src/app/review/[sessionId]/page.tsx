@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useUploadContext } from '@/lib/upload-context';
 import { Clause, Session } from '@/lib/types';
 import { FindingsPane } from '@/components/FindingsPane';
+import { TakeActionModal } from '@/components/TakeActionModal';
 import type { DocumentPaneHandle } from '@/components/DocumentPane';
 
 // Dynamically import DocumentPane to prevent SSR execution of canvas/window
@@ -31,6 +32,7 @@ export default function ReviewPage({ params }: { params: Promise<{ sessionId: st
   const [remainingSeconds, setRemainingSeconds] = useState<number>(30 * 60);
   const [selectedClauseId, setSelectedClauseId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [isActionModalOpen, setIsActionModalOpen] = useState<boolean>(false);
   const [mobileView, setMobileView] = useState<'document' | 'findings'>('findings');
 
   const documentPaneRef = useRef<DocumentPaneHandle>(null);
@@ -205,7 +207,18 @@ export default function ReviewPage({ params }: { params: Promise<{ sessionId: st
           </button>
         </div>
 
-        <div className="flex items-center gap-4 text-xs">
+        <div className="flex items-center gap-3 text-xs">
+          {/* Take Action Button */}
+          <button
+            type="button"
+            onClick={() => setIsActionModalOpen(true)}
+            className="px-3 py-1 bg-ink hover:bg-ink/90 text-paper font-semibold rounded text-xs transition cursor-pointer flex items-center gap-1.5 shadow-2xs"
+            title="Generate HR negotiation email or questions for a lawyer"
+          >
+            <span>Take Action</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-marker" />
+          </button>
+
           {/* 30-min TTL Live Countdown */}
           <div
             className={`flex items-center gap-1.5 font-mono text-xs px-2.5 py-1 rounded border ${
@@ -265,9 +278,19 @@ export default function ReviewPage({ params }: { params: Promise<{ sessionId: st
             rubric={session?.rubric || []}
             selectedClauseId={selectedClauseId}
             onSelectClause={handleSelectClause}
+            onOpenAction={() => setIsActionModalOpen(true)}
           />
         </section>
       </main>
+
+      {/* Candidate Action Modal */}
+      <TakeActionModal
+        isOpen={isActionModalOpen}
+        onClose={() => setIsActionModalOpen(false)}
+        sessionId={sessionId}
+        selectedConcerns={session?.concerns || []}
+        findings={session?.findings || []}
+      />
     </div>
   );
 }

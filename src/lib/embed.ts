@@ -35,10 +35,18 @@ export async function embedTexts(texts: string[]): Promise<number[][] | null> {
     const model = genAI.getGenerativeModel({ model: 'text-embedding-004' });
 
     const vectors: number[][] = [];
-    for (const text of texts) {
-      const truncated = text.slice(0, 2000);
-      const res = await model.embedContent(truncated);
-      vectors.push(res.embedding.values);
+    const CHUNK_SIZE = 5;
+
+    for (let i = 0; i < texts.length; i += CHUNK_SIZE) {
+      const chunk = texts.slice(i, i + CHUNK_SIZE);
+      const results = await Promise.all(
+        chunk.map(async (text) => {
+          const truncated = text.slice(0, 2000);
+          const res = await model.embedContent(truncated);
+          return res.embedding.values;
+        })
+      );
+      vectors.push(...results);
     }
 
     return vectors;

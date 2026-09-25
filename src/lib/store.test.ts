@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { createSession, getSession, deleteSession, clearAllSessions } from './store';
-import { RawFields, VerifiedFields } from './types';
+import { VerifiedFields } from './types';
 
 const emptyFields: VerifiedFields = {
   noticePeriodEmployee: { value: null, confidence: 0, evidence: null },

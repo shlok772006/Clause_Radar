@@ -9,8 +9,6 @@ export interface ClaimCardProps {
 }
 
 export function ClaimCard({ claim, onHighlightClause }: ClaimCardProps) {
-  const primaryEvidence = claim.evidence[0];
-
   return (
     <div className="bg-white border border-rule rounded-lg p-4 shadow-2xs transition-all hover:border-ink-soft/40">
       {/* Top assertion text */}

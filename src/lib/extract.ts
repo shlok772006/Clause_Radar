@@ -59,7 +59,7 @@ export async function extractFields(clauses: Clause[]): Promise<VerifiedFields> 
 
     // Run verification pass
     return verifyExtractedFields(candidateFields, clauses);
-  } catch (err) {
+  } catch {
     // If extraction fails or API is unreachable, return empty fields cleanly
     return {
       ...EMPTY_RAW_FIELDS,

@@ -3,10 +3,10 @@
 ## Current State
 
 - **Milestone:** v1.0
-- **Current Phase:** 3 (The Differentiator)
-- **Phase Status:** complete
-- **Last Action:** verify-work 3 complete — all 8 UAT scenarios verified in browser & recorded in 3-UAT.md
-- **Next Action:** `/gsd-discuss-phase 4` → Discuss Phase 4 (Score and Ship)
+- **Current Phase:** 4 (Score and Ship)
+- **Phase Status:** planned
+- **Last Action:** plan-phase 4 complete — 3 waves detailed in 4-PLAN.md
+- **Next Action:** `/gsd-execute-phase 4` → Execute Wave 1, Wave 2, and Wave 3
 
 ## Phase Progress
 

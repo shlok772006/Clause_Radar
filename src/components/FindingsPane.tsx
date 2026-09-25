@@ -16,6 +16,7 @@ export interface FindingsPaneProps {
   rubricItems?: RubricItem[];
   selectedClauseId: string | null;
   onSelectClause: (clauseId: string) => void;
+  onOpenAction?: () => void;
 }
 
 type TabType = 'clauses' | 'risks' | 'missing' | 'ask';
@@ -28,15 +29,59 @@ export function FindingsPane({
   rubricItems = RUBRIC_ITEMS,
   selectedClauseId,
   onSelectClause,
+  onOpenAction,
 }: FindingsPaneProps) {
   const [activeTab, setActiveTab] = useState<TabType>('clauses');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedConcerns, setSelectedConcerns] = useState<Concern[]>(['exit', 'pay']);
+  const [plainViewMode, setPlainViewMode] = useState<Record<string, 'original' | 'plain'>>({});
+  const [explanations, setExplanations] = useState<
+    Record<string, { text: string; verified: boolean; loading: boolean }>
+  >({});
 
   const handleToggleConcern = (concern: Concern) => {
     setSelectedConcerns((prev) =>
       prev.includes(concern) ? prev.filter((c) => c !== concern) : [...prev, concern]
     );
+  };
+
+  const handleTogglePlain = async (clause: Clause) => {
+    const currentMode = plainViewMode[clause.id] || 'original';
+    const nextMode = currentMode === 'original' ? 'plain' : 'original';
+
+    setPlainViewMode((prev) => ({ ...prev, [clause.id]: nextMode }));
+
+    if (nextMode === 'plain' && !explanations[clause.id]) {
+      setExplanations((prev) => ({
+        ...prev,
+        [clause.id]: { text: '', verified: true, loading: true },
+      }));
+
+      try {
+        const res = await fetch('/api/explain', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId, clauseId: clause.id }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setExplanations((prev) => ({
+            ...prev,
+            [clause.id]: { text: data.text, verified: data.verified, loading: false },
+          }));
+        } else {
+          setExplanations((prev) => ({
+            ...prev,
+            [clause.id]: { text: clause.text, verified: false, loading: false },
+          }));
+        }
+      } catch {
+        setExplanations((prev) => ({
+          ...prev,
+          [clause.id]: { text: clause.text, verified: false, loading: false },
+        }));
+      }
+    }
   };
 
   const filteredClauses = clauses.filter((c) => {
@@ -55,8 +100,9 @@ export function FindingsPane({
   return (
     <aside className="flex flex-col h-full bg-paper overflow-hidden select-text border-l border-rule">
       {/* Tab Navigation */}
-      <nav aria-label="Review Navigation" className="flex border-b border-rule bg-white px-2 pt-2">
+      <nav aria-label="Review Navigation" className="flex border-b border-rule bg-white px-2 pt-2" role="tablist">
         <button
+          id="tab-clauses"
           type="button"
           onClick={() => setActiveTab('clauses')}
           className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold border-b-2 transition-colors cursor-pointer ${
@@ -65,6 +111,7 @@ export function FindingsPane({
               : 'border-transparent text-ink-soft hover:text-ink hover:border-rule'
           }`}
           aria-selected={activeTab === 'clauses'}
+          aria-controls="tabpanel-clauses"
           role="tab"
         >
           <span>Clauses</span>
@@ -74,6 +121,7 @@ export function FindingsPane({
         </button>
 
         <button
+          id="tab-risks"
           type="button"
           onClick={() => setActiveTab('risks')}
           className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold border-b-2 transition-colors cursor-pointer ${
@@ -82,6 +130,7 @@ export function FindingsPane({
               : 'border-transparent text-ink-soft hover:text-ink hover:border-rule'
           }`}
           aria-selected={activeTab === 'risks'}
+          aria-controls="tabpanel-risks"
           role="tab"
         >
           <span>Risks</span>
@@ -95,6 +144,7 @@ export function FindingsPane({
         </button>
 
         <button
+          id="tab-missing"
           type="button"
           onClick={() => setActiveTab('missing')}
           className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold border-b-2 transition-colors cursor-pointer ${
@@ -103,6 +153,7 @@ export function FindingsPane({
               : 'border-transparent text-ink-soft hover:text-ink hover:border-rule'
           }`}
           aria-selected={activeTab === 'missing'}
+          aria-controls="tabpanel-missing"
           role="tab"
         >
           <span>Missing</span>
@@ -118,6 +169,7 @@ export function FindingsPane({
         </button>
 
         <button
+          id="tab-ask"
           type="button"
           onClick={() => setActiveTab('ask')}
           className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold border-b-2 transition-colors cursor-pointer ${
@@ -126,6 +178,7 @@ export function FindingsPane({
               : 'border-transparent text-ink-soft hover:text-ink hover:border-rule'
           }`}
           aria-selected={activeTab === 'ask'}
+          aria-controls="tabpanel-ask"
           role="tab"
         >
           <span>Ask</span>
@@ -144,7 +197,7 @@ export function FindingsPane({
       {/* Tab Contents */}
       <div className="flex-1 overflow-y-auto">
         {activeTab === 'clauses' && (
-          <div className="flex flex-col h-full">
+          <div id="tabpanel-clauses" role="tabpanel" aria-labelledby="tab-clauses" className="flex flex-col h-full">
             {/* Filter bar */}
             <div className="p-3 border-b border-rule bg-paper sticky top-0 z-10">
               <input
@@ -166,17 +219,23 @@ export function FindingsPane({
               ) : (
                 filteredClauses.map((clause) => {
                   const isSelected = selectedClauseId === clause.id;
-                  const previewText = clause.text.slice(0, 110).trim();
+                  const isPlain = plainViewMode[clause.id] === 'plain';
+                  const exp = explanations[clause.id];
 
                   return (
                     <li key={clause.id}>
-                      <button
-                        type="button"
+                      <div
                         onClick={() => onSelectClause(clause.id)}
-                        className={`w-full text-left p-3.5 transition-colors cursor-pointer block hover:bg-white/80 focus:outline-none focus:ring-1 focus:ring-ink ${
+                        className={`w-full text-left p-3.5 transition-colors cursor-pointer block hover:bg-white/80 ${
                           isSelected ? 'bg-white border-l-4 border-l-marker shadow-xs' : ''
                         }`}
-                        aria-current={isSelected ? 'true' : undefined}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            onSelectClause(clause.id);
+                          }
+                        }}
                       >
                         <div className="flex items-center justify-between gap-2 mb-1">
                           <span className="text-xs font-semibold text-ink font-mono">
@@ -193,11 +252,82 @@ export function FindingsPane({
                           </div>
                         )}
 
-                        <p className="text-xs text-ink/85 line-clamp-2 leading-relaxed">
-                          {previewText}
-                          {clause.text.length > 110 && '…'}
-                        </p>
-                      </button>
+                        {/* Clause Body: Preview when collapsed, Full/Plain when expanded */}
+                        {!isSelected ? (
+                          <p className="text-xs text-ink/85 line-clamp-2 leading-relaxed">
+                            {clause.text.slice(0, 110).trim()}
+                            {clause.text.length > 110 && '…'}
+                          </p>
+                        ) : (
+                          <div className="mt-2 pt-2 border-t border-rule space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] uppercase font-mono tracking-wider text-ink-soft">
+                                View Mode
+                              </span>
+                              <div className="flex items-center bg-paper rounded p-0.5 border border-rule gap-0.5">
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setPlainViewMode((prev) => ({ ...prev, [clause.id]: 'original' }));
+                                  }}
+                                  className={`px-2 py-0.5 text-[10px] font-semibold rounded transition cursor-pointer ${
+                                    !isPlain
+                                      ? 'bg-white shadow-2xs text-ink'
+                                      : 'text-ink-soft hover:text-ink'
+                                  }`}
+                                >
+                                  As written
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleTogglePlain(clause);
+                                  }}
+                                  className={`px-2 py-0.5 text-[10px] font-semibold rounded transition cursor-pointer flex items-center gap-1 ${
+                                    isPlain
+                                      ? 'bg-ink text-paper shadow-2xs'
+                                      : 'text-ink-soft hover:text-ink'
+                                  }`}
+                                >
+                                  <span>Plain English</span>
+                                  <span className="w-1.5 h-1.5 rounded-full bg-marker" />
+                                </button>
+                              </div>
+                            </div>
+
+                            {isPlain ? (
+                              exp?.loading ? (
+                                <div className="flex items-center gap-2 p-3 bg-paper rounded text-xs text-ink-soft">
+                                  <div className="w-3.5 h-3.5 rounded-full border-2 border-ink border-t-transparent animate-spin" />
+                                  <span>Simplifying clause and verifying numbers...</span>
+                                </div>
+                              ) : (
+                                <div className="p-3 bg-paper/60 border border-marker/60 rounded-lg text-xs space-y-1.5 shadow-2xs">
+                                  <div className="flex items-center justify-between text-[10px] font-mono">
+                                    <span className="font-semibold text-ink">Simplified for candidates</span>
+                                    {exp?.verified ? (
+                                      <span className="text-verified flex items-center gap-1 font-semibold">
+                                        ✓ Numbers verified
+                                      </span>
+                                    ) : (
+                                      <span className="text-amber-800">Unverified numbers</span>
+                                    )}
+                                  </div>
+                                  <p className="text-xs text-ink leading-relaxed">
+                                    {exp?.text || clause.text}
+                                  </p>
+                                </div>
+                              )
+                            ) : (
+                              <p className="text-xs text-ink leading-relaxed font-serif bg-paper/50 p-2.5 rounded border border-rule/60">
+                                {clause.text}
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </li>
                   );
                 })
@@ -207,28 +337,35 @@ export function FindingsPane({
         )}
 
         {activeTab === 'risks' && (
-          <RiskDashboard
-            findings={findings}
-            selectedConcerns={selectedConcerns}
-            onHighlightClause={onSelectClause}
-          />
+          <div id="tabpanel-risks" role="tabpanel" aria-labelledby="tab-risks">
+            <RiskDashboard
+              findings={findings}
+              selectedConcerns={selectedConcerns}
+              onHighlightClause={onSelectClause}
+              onOpenAction={onOpenAction}
+            />
+          </div>
         )}
 
         {activeTab === 'missing' && (
-          <MissingReport
-            rubricResults={rubric}
-            rubricItems={rubricItems}
-            selectedConcerns={selectedConcerns}
-            onHighlightClause={onSelectClause}
-          />
+          <div id="tabpanel-missing" role="tabpanel" aria-labelledby="tab-missing">
+            <MissingReport
+              rubricResults={rubric}
+              rubricItems={rubricItems}
+              selectedConcerns={selectedConcerns}
+              onHighlightClause={onSelectClause}
+            />
+          </div>
         )}
 
         {activeTab === 'ask' && (
-          <AskPanel
-            sessionId={sessionId}
-            clauses={clauses}
-            onHighlightClause={onSelectClause}
-          />
+          <div id="tabpanel-ask" role="tabpanel" aria-labelledby="tab-ask">
+            <AskPanel
+              sessionId={sessionId}
+              clauses={clauses}
+              onHighlightClause={onSelectClause}
+            />
+          </div>
         )}
       </div>
 

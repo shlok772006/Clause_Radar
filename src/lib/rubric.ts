@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import YAML from 'yaml';
-import { Clause, Presence, RubricItem, RubricResult } from '@/lib/types';
+import { Clause, Presence, RubricItem, RubricResult, Concern, Severity } from '@/lib/types';
 import { cosineSimilarity } from './embed';
 import { normalizeText } from './verify';
 
@@ -10,6 +10,18 @@ export const UNCLEAR_FLOOR = 0.50;
 
 let cachedRubricItems: RubricItem[] | null = null;
 let cachedPrecomputedVectors: Record<string, number[][]> | null = null;
+
+interface RawRubricItem {
+  id: string;
+  label: string;
+  concern: Concern;
+  whyItMatters: string;
+  ifMissingAsk: string;
+  severityIfMissing: Severity;
+  queries?: string[];
+  keywords?: string[];
+  threshold?: number;
+}
 
 /**
  * Loads the 20 rubric items from config/clause-rubric.yaml
@@ -21,7 +33,8 @@ export function loadRubricItems(): RubricItem[] {
   const yamlContent = fs.readFileSync(rubricPath, 'utf-8');
   const parsed = YAML.parse(yamlContent);
 
-  cachedRubricItems = parsed.items.map((item: any) => ({
+  const rawItems = (parsed.items || []) as RawRubricItem[];
+  cachedRubricItems = rawItems.map((item) => ({
     id: item.id,
     label: item.label,
     concern: item.concern,

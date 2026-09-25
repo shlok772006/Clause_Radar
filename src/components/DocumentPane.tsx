@@ -17,14 +17,8 @@ export interface DocumentPaneProps {
   onFileChange?: (file: File) => void;
 }
 
-interface PageState {
-  pageNumber: number;
-  rendered: boolean;
-  rendering: boolean;
-}
-
 export const DocumentPane = forwardRef<DocumentPaneHandle, DocumentPaneProps>(function DocumentPane(
-  { file, clauses, highlightedClauseId, onClauseSelect, onFileChange },
+  { file, clauses, highlightedClauseId, onFileChange },
   ref
 ) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -34,7 +28,7 @@ export const DocumentPane = forwardRef<DocumentPaneHandle, DocumentPaneProps>(fu
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [activeHighlightId, setActiveHighlightId] = useState<string | null>(null);
+  const [, setActiveHighlightId] = useState<string | null>(null);
   const [srAnnouncement, setSrAnnouncement] = useState<string>('');
 
   const pdfjsLibRef = useRef<typeof PdfjsTypes | null>(null);

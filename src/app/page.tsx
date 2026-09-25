@@ -12,18 +12,16 @@ function UploadContent() {
   const [dragActive, setDragActive] = useState<boolean>(false);
   const [loadingStep, setLoadingStep] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [deletedNotice, setDeletedNotice] = useState<boolean>(false);
+  const deletedNotice = searchParams.get('deleted') === 'true';
 
   useEffect(() => {
-    if (searchParams.get('deleted') === 'true') {
-      setDeletedNotice(true);
+    if (deletedNotice) {
       clearFile();
     }
-  }, [searchParams, clearFile]);
+  }, [deletedNotice, clearFile]);
 
   const handleUpload = async (selectedFile: File) => {
     setErrorMessage(null);
-    setDeletedNotice(false);
 
     // Client-side quick validation
     if (selectedFile.type !== 'application/pdf' && !selectedFile.name.toLowerCase().endsWith('.pdf')) {

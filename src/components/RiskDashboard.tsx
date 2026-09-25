@@ -7,6 +7,7 @@ export interface RiskDashboardProps {
   findings: Finding[];
   selectedConcerns: Concern[];
   onHighlightClause: (clauseId: string) => void;
+  onOpenAction?: () => void;
 }
 
 const SEVERITY_ORDER: Record<Severity, number> = {
@@ -50,6 +51,7 @@ export function RiskDashboard({
   findings,
   selectedConcerns,
   onHighlightClause,
+  onOpenAction,
 }: RiskDashboardProps) {
   // Sort findings: concern match first -> severity
   const sortedFindings = [...findings].sort((a, b) => {
@@ -81,6 +83,31 @@ export function RiskDashboard({
 
   return (
     <div className="p-4 space-y-4">
+      {/* Take Action Banner */}
+      {onOpenAction && (
+        <div className="bg-white border border-rule rounded-xl p-3.5 flex items-center justify-between gap-3 shadow-2xs">
+          <div>
+            <h4 className="text-xs font-bold text-ink flex items-center gap-1.5">
+              <span>Ready to negotiate or clarify?</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-marker" />
+            </h4>
+            <p className="text-[11px] text-ink-soft mt-0.5">
+              Draft an HR candidate email or 5 targeted questions for a lawyer.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onOpenAction}
+            className="px-3 py-1.5 bg-ink hover:bg-ink/90 text-paper text-xs font-semibold rounded transition cursor-pointer flex items-center gap-1.5 shrink-0 shadow-2xs"
+          >
+            <span>Take Action</span>
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </button>
+        </div>
+      )}
+
       <div className="flex items-center justify-between text-xs text-ink-soft mb-1">
         <span>
           <strong>{sortedFindings.length}</strong> risk findings evaluated with citations

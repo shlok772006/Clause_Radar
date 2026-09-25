@@ -18,6 +18,19 @@ export interface RiskRuleConfig {
 
 let cachedRules: RiskRuleConfig[] | null = null;
 
+interface RawRiskRule {
+  id: string;
+  when: string;
+  severity: Severity;
+  concern: Concern;
+  title: string;
+  explanation: string;
+  benchmark?: string;
+  legalNote?: string;
+  suggestedQuestion: string;
+  evidenceFrom: string | string[];
+}
+
 /**
  * Loads the 14 risk rules from config/risk-rules.yaml
  */
@@ -28,7 +41,8 @@ export function loadRiskRules(): RiskRuleConfig[] {
   const content = fs.readFileSync(rulesPath, 'utf-8');
   const parsed = YAML.parse(content);
 
-  cachedRules = (parsed.rules || []).map((r: any) => ({
+  const rawRules = (parsed.rules || []) as RawRiskRule[];
+  cachedRules = rawRules.map((r) => ({
     id: r.id,
     when: r.when,
     severity: r.severity,
@@ -47,13 +61,13 @@ export function loadRiskRules(): RiskRuleConfig[] {
 /**
  * Extracts a field value from VerifiedFields given a path like "noticePeriodEmployee.value"
  */
-function getFieldValue(pathStr: string, fields: VerifiedFields): any {
+function getFieldValue(pathStr: string, fields: VerifiedFields): unknown {
   const parts = pathStr.split('.');
   const fieldName = parts[0] as keyof VerifiedFields;
   const prop = parts[1] || 'value';
 
   if (fieldName in fields) {
-    const fieldObj = fields[fieldName] as any;
+    const fieldObj = fields[fieldName] as Record<string, unknown> | undefined;
     if (fieldObj && typeof fieldObj === 'object') {
       return fieldObj[prop];
     }
@@ -74,7 +88,7 @@ function evaluateComparison(expr: string, fields: VerifiedFields): boolean {
   const [, leftPath, op, rightLiteral] = match;
   const leftVal = getFieldValue(leftPath, fields);
 
-  let rightVal: any;
+  let rightVal: unknown;
   const rightTrimmed = rightLiteral.trim();
 
   if (rightTrimmed === 'null') {
@@ -179,7 +193,7 @@ export function evaluateRules(
 
     for (const src of fieldSources) {
       const fieldKey = src as keyof VerifiedFields;
-      const field = fields[fieldKey] as any;
+      const field = fields[fieldKey] as { evidence?: Evidence | null } | undefined;
 
       if (field && typeof field === 'object' && field.evidence) {
         const ev = field.evidence as Evidence;

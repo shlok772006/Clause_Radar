@@ -4,6 +4,7 @@ import { segmentClauses } from '@/lib/segment';
 import { createSession, updateSession } from '@/lib/store';
 import { scanForInjection } from '@/lib/injection';
 import { extractFields } from '@/lib/extract';
+import { embedTexts } from '@/lib/embed';
 import { matchRubric, loadPrecomputedVectors } from '@/lib/rubric';
 import { evaluateRules } from '@/lib/rules';
 import { RUBRIC_ITEMS } from '@/lib/rubric-data';
@@ -125,7 +126,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       concerns: [],
     });
 
-    // Background P1 extraction & Risk Rules evaluation
+    // Background P1 extraction, Risk Rules evaluation, and Vector Embedding Rubric Matching
     if (process.env.GEMINI_API_KEY) {
       extractFields(clauses)
         .then((verifiedFields) => {
@@ -143,6 +144,21 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         })
         .catch(() => {
           console.warn(`[extract_warn] sessionId=${sessionId} background extraction failed`);
+        });
+
+      embedTexts(clauses.map((c) => c.text))
+        .then((clauseVectors) => {
+          if (clauseVectors && clauseVectors.length === clauses.length) {
+            const vectorRubric = matchRubric(clauses, RUBRIC_ITEMS, precomputedVectors, clauseVectors);
+            updateSession(sessionId, {
+              vectors: clauseVectors,
+              rubric: vectorRubric,
+            });
+            console.info(`[embed_rubric] sessionId=${sessionId} vectorsComputed=${clauseVectors.length}`);
+          }
+        })
+        .catch(() => {
+          console.warn(`[embed_warn] sessionId=${sessionId} background embedding failed`);
         });
     }
 
