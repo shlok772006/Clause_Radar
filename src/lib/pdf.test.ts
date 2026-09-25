@@ -40,4 +40,10 @@ describe('parsePdf validation', () => {
       expect((err as PdfProcessingError).error.type).toBe('not_pdf');
     }
   });
+
+  it('PdfProcessingError supports password_protected error type', () => {
+    const error = new PdfProcessingError({ type: 'password_protected' });
+    expect(error.error.type).toBe('password_protected');
+    expect(error.message).toBe('password_protected');
+  });
 });

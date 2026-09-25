@@ -28,6 +28,7 @@ export type PdfError =
   | { type: 'too_large'; sizeMB: number }
   | { type: 'too_many_pages'; pageCount: number }
   | { type: 'scan_detected'; avgCharsPerPage: number }
+  | { type: 'password_protected' }
   | { type: 'parse_failed'; message: string }
   | { type: 'timeout' };
 
@@ -133,6 +134,19 @@ export async function parsePdf(buffer: ArrayBuffer): Promise<PdfParseResult> {
     if (err instanceof PdfProcessingError) {
       throw err;
     }
+    const isPasswordError = Boolean(
+      err &&
+        typeof err === 'object' &&
+        (('name' in err && (err as { name?: string }).name === 'PasswordException') ||
+          ('message' in err &&
+            typeof (err as { message?: string }).message === 'string' &&
+            (err as { message: string }).message.toLowerCase().includes('password')))
+    );
+
+    if (isPasswordError) {
+      throw new PdfProcessingError({ type: 'password_protected' });
+    }
+
     throw new PdfProcessingError({
       type: 'parse_failed',
       message: err instanceof Error ? err.message : 'Unable to parse document',

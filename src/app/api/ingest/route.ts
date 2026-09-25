@@ -37,7 +37,8 @@ const ERROR_MESSAGES: Record<PdfError['type'], string> = {
   too_large: "This file is over 15 MB. Employment agreements are usually smaller — check if you have a compressed version.",
   too_many_pages: "This document is over 60 pages. Clause Radar is designed for standard employment agreements.",
   scan_detected: "This looks like a scanned image, so there's no text to read. If you have the original PDF from HR, that will work.",
-  parse_failed: "We couldn't read this PDF. It may be corrupted or password-protected.",
+  password_protected: "This PDF is password-protected. Please remove the password protection (e.g. open in Chrome or Acrobat and choose 'Print to PDF') and try uploading again.",
+  parse_failed: "We couldn't read this PDF. It may be corrupted or in an unsupported format.",
   timeout: "This document is taking too long to process. Try a smaller file.",
 };
 
@@ -175,6 +176,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     });
   } catch (err) {
     if (err instanceof PdfProcessingError) {
+      console.warn(`[ingest_error] type=${err.error.type}`);
       const message = ERROR_MESSAGES[err.error.type] || 'Failed to process PDF.';
       return NextResponse.json(
         { error: err.error.type, message },
@@ -183,6 +185,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     }
 
     const message = err instanceof Error ? err.message : 'An unexpected error occurred processing the file.';
+    console.error(`[ingest_error] type=unexpected error=${err instanceof Error ? err.name : 'unknown'}`);
     return NextResponse.json(
       { error: 'parse_failed', message },
       { status: 500 }
