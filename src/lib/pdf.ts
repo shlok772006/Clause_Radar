@@ -1,5 +1,22 @@
 // Pure PDF text extraction and validation for Clause Radar (Node / server-side)
 
+// Polyfill Promise.withResolvers for Node runtimes < 22 required by pdfjs-dist
+if (typeof (Promise as unknown as { withResolvers?: unknown }).withResolvers === 'undefined') {
+  Object.defineProperty(Promise, 'withResolvers', {
+    value: function <T>() {
+      let resolve!: (value: T | PromiseLike<T>) => void;
+      let reject!: (reason?: unknown) => void;
+      const promise = new Promise<T>((res, rej) => {
+        resolve = res;
+        reject = rej;
+      });
+      return { promise, resolve, reject };
+    },
+    writable: true,
+    configurable: true,
+  });
+}
+
 export type PdfParseResult = {
   text: string;
   pageBreaks: number[]; // character offsets where each page starts (0-indexed offset in text)

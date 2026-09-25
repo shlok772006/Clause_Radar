@@ -1,5 +1,22 @@
 "use client";
 
+// Polyfill Promise.withResolvers for browsers/environments that lack it
+if (typeof (Promise as unknown as { withResolvers?: unknown }).withResolvers === 'undefined') {
+  Object.defineProperty(Promise, 'withResolvers', {
+    value: function <T>() {
+      let resolve!: (value: T | PromiseLike<T>) => void;
+      let reject!: (reason?: unknown) => void;
+      const promise = new Promise<T>((res, rej) => {
+        resolve = res;
+        reject = rej;
+      });
+      return { promise, resolve, reject };
+    },
+    writable: true,
+    configurable: true,
+  });
+}
+
 import React, { useEffect, useRef, useState, useImperativeHandle, forwardRef, useCallback } from 'react';
 import { Clause } from '@/lib/types';
 import type * as PdfjsTypes from 'pdfjs-dist';
