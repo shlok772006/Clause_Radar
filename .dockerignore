@@ -1,0 +1,13 @@
+.git
+.gitignore
+.env*.local
+node_modules
+.next
+.kilo
+.planning
+docs
+eval
+coverage
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
