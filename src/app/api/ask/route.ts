@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/store';
-import { serializeClauses } from '@/lib/prompts/serializer';
-import { P2_ASK_SYSTEM_INSTRUCTION, P2_ASK_RESPONSE_SCHEMA } from '@/lib/prompts/p2-ask';
-import { getStructuredModel } from '@/lib/gemini';
-import { verifyAnswerEnvelope } from '@/lib/verify';
-import { AnswerEnvelope } from '@/lib/types';
+import { askQuestion } from '@/lib/ask';
 
 interface AskRequestBody {
   sessionId?: string;
@@ -61,27 +57,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   }
 
   try {
-    const serializedDocument = serializeClauses(session.clauses);
-    const userPrompt = `AGREEMENT CLAUSES:\n${serializedDocument}\n\nQUESTION: ${question.trim()}`;
-
-    const model = getStructuredModel({
-      systemInstruction: P2_ASK_SYSTEM_INSTRUCTION,
-      responseSchema: P2_ASK_RESPONSE_SCHEMA,
-      temperature: 0,
-    });
-
-    const result = await model.generateContent(userPrompt);
-    const responseText = result.response.text();
-
-    let candidateEnvelope: AnswerEnvelope;
-    try {
-      candidateEnvelope = JSON.parse(responseText);
-    } catch {
-      throw new Error('Model produced non-JSON output');
-    }
-
-    // Pass through Grounding Verifier
-    const verifiedEnvelope = verifyAnswerEnvelope(candidateEnvelope, session.clauses);
+    const verifiedEnvelope = await askQuestion(question, session.clauses);
 
     const elapsedMs = Date.now() - startTime;
     // Log IDs, counts, timings ONLY (AGENTS.md rule 8)

@@ -13,31 +13,31 @@
     "question": "Is there an employment service bond?",
     "type": "answerable",
     "expectedValue": "24 months",
-    "expectedClauseNumber": "11.3"
+    "expectedClauseNumber": "9.1"
   },
   {
     "id": "q03",
     "fixture": "test-agreement",
     "question": "How much is the penalty if I leave during the bond period?",
     "type": "answerable",
-    "expectedValue": "150000 INR",
-    "expectedClauseNumber": "11.3"
+    "expectedValue": "2,50,000",
+    "expectedClauseNumber": "9.2"
   },
   {
     "id": "q04",
     "fixture": "test-agreement",
-    "question": "Can I work on external freelancing or moonlight?",
+    "question": "How long is the non-compete restriction after leaving?",
     "type": "answerable",
-    "expectedValue": "restricted / prior written consent required",
-    "expectedClauseNumber": "6.1"
+    "expectedValue": "12 months",
+    "expectedClauseNumber": "7.1"
   },
   {
     "id": "q05",
     "fixture": "test-agreement",
     "question": "Who owns intellectual property and inventions I develop?",
     "type": "answerable",
-    "expectedValue": "assigned to company",
-    "expectedClauseNumber": "5.1"
+    "expectedValue": "work made for hire",
+    "expectedClauseNumber": "6.1"
   },
   {
     "id": "q06",
