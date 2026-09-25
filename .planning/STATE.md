@@ -4,9 +4,9 @@
 
 - **Milestone:** v1.0
 - **Current Phase:** 4 (Score and Ship)
-- **Phase Status:** planned
-- **Last Action:** plan-phase 4 complete — 3 waves detailed in 4-PLAN.md
-- **Next Action:** `/gsd-execute-phase 4` → Execute Wave 1, Wave 2, and Wave 3
+- **Phase Status:** executed
+- **Last Action:** execute-phase 4 complete — all 3 waves implemented, 60 tests pass, build green
+- **Next Action:** `/gsd-verify-work 4` → Verify Phase 4 features in browser
 
 ## Phase Progress
 
@@ -15,7 +15,7 @@
 | 1 | The Spine | complete | 1 |
 | 2 | Grounding and Refusal | complete | 2 |
 | 3 | The Differentiator | complete | 3 |
-| 4 | Score and Ship | not_started | 4 |
+| 4 | Score and Ship | executed | 4 |
 | 5 | Prove It | not_started | 5 |
 
 ## Active Decisions
