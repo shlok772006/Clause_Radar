@@ -1,7 +1,7 @@
 import { Clause, AnswerEnvelope } from './types';
 import { serializeClauses } from './prompts/serializer';
 import { P2_ASK_SYSTEM_INSTRUCTION, P2_ASK_RESPONSE_SCHEMA } from './prompts/p2-ask';
-import { getStructuredModel } from './gemini';
+import { generateContentWithFallback } from './gemini';
 import { verifyAnswerEnvelope } from './verify';
 
 /**
@@ -40,13 +40,14 @@ export async function askQuestion(
   const serializedDocument = serializeClauses(clauses);
   const userPrompt = `AGREEMENT CLAUSES:\n${serializedDocument}\n\nQUESTION: ${question.trim()}`;
 
-  const model = getStructuredModel({
-    systemInstruction: P2_ASK_SYSTEM_INSTRUCTION,
-    responseSchema: P2_ASK_RESPONSE_SCHEMA,
-    temperature: 0,
-  });
-
-  const result = await model.generateContent(userPrompt);
+  const result = await generateContentWithFallback(
+    {
+      systemInstruction: P2_ASK_SYSTEM_INSTRUCTION,
+      responseSchema: P2_ASK_RESPONSE_SCHEMA,
+      temperature: 0,
+    },
+    userPrompt
+  );
   const responseText = result.response.text();
 
   let candidateEnvelope: AnswerEnvelope;
