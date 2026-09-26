@@ -37,6 +37,11 @@ COPY --from=builder /app/config ./config
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
+# pdfjs-dist is a serverExternalPackage. The standalone trace only copies
+# pdf.mjs but not the worker or support files. Copy the full package so
+# the fake-worker dynamic import and font/cmap loading work at runtime.
+COPY --from=builder /app/node_modules/pdfjs-dist ./node_modules/pdfjs-dist
+
 USER nextjs
 
 EXPOSE 8080

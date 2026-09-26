@@ -102,7 +102,16 @@ export async function parsePdf(buffer: ArrayBuffer): Promise<PdfParseResult> {
     pdfjsLib = imported;
 
     if (!pdfjsLib.GlobalWorkerOptions?.workerSrc) {
-      pdfjsLib.GlobalWorkerOptions.workerSrc = import.meta.resolve('pdfjs-dist/legacy/build/pdf.worker.mjs');
+      // Resolve the worker path relative to the main pdf.mjs module.
+      // import.meta.resolve may fail in standalone/Docker where the worker file
+      // is not traced by Next.js. Use new URL() relative to the module instead.
+      try {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = import.meta.resolve('pdfjs-dist/legacy/build/pdf.worker.mjs');
+      } catch {
+        // Fallback: construct the path relative to where pdf.mjs was loaded from
+        const pdfMjsUrl = import.meta.resolve('pdfjs-dist/legacy/build/pdf.mjs');
+        pdfjsLib.GlobalWorkerOptions.workerSrc = new URL('./pdf.worker.mjs', pdfMjsUrl).href;
+      }
     }
   } catch (err) {
     throw new PdfProcessingError({
