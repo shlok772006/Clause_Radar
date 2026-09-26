@@ -27,7 +27,7 @@ export interface ModelOptions {
  */
 export function getStructuredModel(options: ModelOptions): GenerativeModel {
   const client = getGeminiClient();
-  const modelName = options.modelName || process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+  const modelName = options.modelName || process.env.GEMINI_MODEL || 'gemini-3.8-flash';
 
   return client.getGenerativeModel({
     model: modelName,

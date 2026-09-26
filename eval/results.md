@@ -1,6 +1,6 @@
 # Clause Radar — Evaluation Benchmark Results
 
-**Date:** 2026-09-25  
+**Date:** 2026-09-26  
 **Harness:** `eval/run.ts` via `npm run eval`  
 **Target:** Indian Employment Agreement Fixtures  
 

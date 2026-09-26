@@ -71,15 +71,23 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     const errorType = err instanceof Error ? err.name : 'UnknownError';
     console.error(`[ask_error] sessionId=${sessionId} errorType=${errorType} elapsedMs=${elapsedMs}`);
 
+    const msg = err instanceof Error ? err.message : '';
+    let clarifyText = 'The AI model service encountered a temporary error. Would you like to retry your question?';
+    if (msg.includes('402') || msg.includes('prepayment credits') || msg.includes('Payment Required')) {
+      clarifyText = 'Google AI Studio reported: Prepayment credits are depleted (402 Payment Required). Please top up credits or update your GEMINI_API_KEY in .env.local.';
+    } else if (msg.includes('404') || msg.includes('not found')) {
+      clarifyText = 'The configured Gemini model was not found (404). Please verify GEMINI_MODEL in your environment variables.';
+    } else if (msg.includes('API_KEY_INVALID') || msg.includes('403')) {
+      clarifyText = 'Invalid or unauthorized GEMINI_API_KEY. Please verify your API key in .env.local.';
+    }
+
     // If Gemini API fails, return clean fallback refusal envelope
     return NextResponse.json(
       {
         status: 'insufficient_evidence',
         claims: [],
         nearestClauseIds: session.clauses.slice(0, 3).map((c) => c.id),
-        clarifyWithProfessional: [
-          'The AI model service encountered a temporary error. Would you like to retry your question?',
-        ],
+        clarifyWithProfessional: [clarifyText],
         discardedCount: 0,
         error: 'model_unavailable',
       },

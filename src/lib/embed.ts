@@ -32,7 +32,7 @@ export async function embedTexts(texts: string[]): Promise<number[][] | null> {
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'text-embedding-004' });
+    const model = genAI.getGenerativeModel({ model: process.env.GEMINI_EMBEDDING_MODEL || 'gemini-embedding-001' });
 
     const vectors: number[][] = [];
     const CHUNK_SIZE = 5;
